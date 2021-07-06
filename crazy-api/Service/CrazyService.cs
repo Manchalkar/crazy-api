@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
 
 namespace crazy_api.Service
@@ -19,7 +20,6 @@ namespace crazy_api.Service
         
         public List<Models.CrazyApi> GetPerson()
         {
-
             var con = Configuration.GetSection("ConnectionStrings:PSKSConn").Value;
             //var con = ConfigurationManager.ConnectionStrings["Yourconnection"].ToString();
             List<Models.CrazyApi> matchingPerson = new List<Models.CrazyApi>();
@@ -57,25 +57,20 @@ namespace crazy_api.Service
             try
             {
                 SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
-
-                builder.DataSource = "<your_server.database.windows.net>";
-                builder.UserID = "<your_username>";
-                builder.Password = "<your_password>";
-                builder.InitialCatalog = "<your_database>";
-
                 using (SqlConnection connection = new SqlConnection(con))
                 {
                     connection.Open();
                     string sql = "Select * from Person where Id > 0";
                     using (SqlCommand command = new SqlCommand(sql, connection))
                     {
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
+                        SqlDataReader dr = command.ExecuteReader();
+                        //using (SqlDataReader reader = command.ExecuteReader())
+                        //{
+                            while (dr.Read())
                             {
-                                Console.WriteLine("{0} {1}", reader.GetString(0), reader.GetString(1));
+                                Console.WriteLine("{0} {1}", dr.GetString(0), dr.GetString(1));
                             }
-                        }
+                        //}
                     }
                 }
             }
