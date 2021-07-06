@@ -60,7 +60,7 @@ namespace crazy_api.Service
                 using (SqlConnection connection = new SqlConnection(con))
                 {
                     connection.Open();
-                    string sql = "Select * from Person where Id > 0";
+                    string sql = "Select top 1 * from Person where Id > 0";
                     using (SqlCommand command = new SqlCommand(sql, connection))
                     {
                         SqlDataReader dr = command.ExecuteReader();
