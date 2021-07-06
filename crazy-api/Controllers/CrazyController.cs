@@ -19,6 +19,7 @@ namespace crazy_api.Controllers
         }
 
         [HttpGet]
+        [Route("GetPersons")]
         public IActionResult GetPerson()
         {
             return Ok(_course_service.GetPerson());

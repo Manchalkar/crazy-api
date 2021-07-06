@@ -20,33 +20,74 @@ namespace crazy_api.Service
         public List<Models.CrazyApi> GetPerson()
         {
 
-            var con = Configuration.GetSection("Appsettings:PSKSConn").Value;
+            var con = Configuration.GetSection("ConnectionStrings:PSKSConn").Value;
             //var con = ConfigurationManager.ConnectionStrings["Yourconnection"].ToString();
             List<Models.CrazyApi> matchingPerson = new List<Models.CrazyApi>();
-            using (SqlConnection myConnection = new SqlConnection(con))
+
+            //string oString = "Select * from Person where Id > 0";
+            //string connetionString;
+            //SqlConnection cnn;
+            //connetionString = @"Data Source=WIN-50GP30FGO75;Initial Catalog=Demodb;User ID=sa;Password=demol23";
+            //cnn = new SqlConnection(con);
+            //cnn.Open();
+
+            //using (SqlConnection myConnection = new SqlConnection(con))
+            //{
+            //    string oString = "Select * from Person where Id > 0";
+            //    SqlCommand oCmd = new SqlCommand(oString, myConnection);
+            //    //oCmd.Parameters.AddWithValue("@Fname", fName);
+            //    myConnection.Open();
+            //    using (SqlDataReader oReader = oCmd.ExecuteReader())
+            //    {
+            //        while (oReader.Read())
+            //        {
+            //            foreach (Models.CrazyApi item in oReader)
+            //            {
+            //                Models.CrazyApi newModel = new Models.CrazyApi();
+            //                newModel.Id = item.Id;
+            //                newModel.Name = item.Name;
+            //                newModel.Email = item.Email;
+            //                newModel.Phone = item.Phone;
+            //                matchingPerson.Add(newModel);
+            //            }
+            //        }
+            //        myConnection.Close();
+            //    }
+
+            try
             {
-                string oString = "Select * from Person where Id > 0";
-                SqlCommand oCmd = new SqlCommand(oString, myConnection);
-                //oCmd.Parameters.AddWithValue("@Fname", fName);
-                myConnection.Open();
-                using (SqlDataReader oReader = oCmd.ExecuteReader())
+                SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
+
+                builder.DataSource = "<your_server.database.windows.net>";
+                builder.UserID = "<your_username>";
+                builder.Password = "<your_password>";
+                builder.InitialCatalog = "<your_database>";
+
+                using (SqlConnection connection = new SqlConnection(con))
                 {
-                    while (oReader.Read())
+                    connection.Open();
+                    string sql = "Select * from Person where Id > 0";
+                    using (SqlCommand command = new SqlCommand(sql, connection))
                     {
-                        foreach (Models.CrazyApi item in oReader)
+                        using (SqlDataReader reader = command.ExecuteReader())
                         {
-                            Models.CrazyApi newModel = new Models.CrazyApi();
-                            newModel.Id = item.Id;
-                            newModel.Name = item.Name;
-                            newModel.Email = item.Email;
-                            newModel.Phone = item.Phone;
-                            matchingPerson.Add(newModel);
+                            while (reader.Read())
+                            {
+                                Console.WriteLine("{0} {1}", reader.GetString(0), reader.GetString(1));
+                            }
                         }
                     }
-                    myConnection.Close();
                 }
-                return matchingPerson;
+            }
+            catch (SqlException e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+            Console.WriteLine("\nDone. Press enter.");
+            Console.ReadLine();
+
+
+            return matchingPerson;
             }
         }
     }
-}
