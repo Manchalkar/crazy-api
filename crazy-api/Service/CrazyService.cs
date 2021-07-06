@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 
 namespace crazy_api.Service
 {
@@ -9,19 +11,42 @@ namespace crazy_api.Service
     {
         public List<Models.CrazyApi> course_lst;
 
-        public CrazyService()
+        public CrazyService(IConfiguration configuration)
         {
-            course_lst = new List<Models.CrazyApi>()
-            {
-                new Models.CrazyApi() {MyProperty=1,Name="AZ-204"},
-                new Models.CrazyApi() {MyProperty=2,Name="AZ-303"},
-                new Models.CrazyApi() {MyProperty=3,Name="AZ-304"}
-            };
+            Configuration = configuration;
         }
-
-        public IEnumerable<Models.CrazyApi> GetCourses()
+        public IConfiguration Configuration { get; }
+        
+        public List<Models.CrazyApi> GetPerson()
         {
-            return (course_lst);
+
+            var con = Configuration.GetSection("Appsettings:PSKSConn").Value;
+            //var con = ConfigurationManager.ConnectionStrings["Yourconnection"].ToString();
+            List<Models.CrazyApi> matchingPerson = new List<Models.CrazyApi>();
+            using (SqlConnection myConnection = new SqlConnection(con))
+            {
+                string oString = "Select * from Person where Id > 0";
+                SqlCommand oCmd = new SqlCommand(oString, myConnection);
+                //oCmd.Parameters.AddWithValue("@Fname", fName);
+                myConnection.Open();
+                using (SqlDataReader oReader = oCmd.ExecuteReader())
+                {
+                    while (oReader.Read())
+                    {
+                        foreach (Models.CrazyApi item in oReader)
+                        {
+                            Models.CrazyApi newModel = new Models.CrazyApi();
+                            newModel.Id = item.Id;
+                            newModel.Name = item.Name;
+                            newModel.Email = item.Email;
+                            newModel.Phone = item.Phone;
+                            matchingPerson.Add(newModel);
+                        }
+                    }
+                    myConnection.Close();
+                }
+                return matchingPerson;
+            }
         }
     }
 }

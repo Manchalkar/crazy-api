@@ -19,9 +19,14 @@ namespace crazy_api.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetCourses()
+        public IActionResult GetPerson()
         {
-            return Ok(_course_service.GetCourses());
+            return Ok(_course_service.GetPerson());
         }
+        //[HttpPost]
+        //public IActionResult PostPerson(Models.CrazyApi model)
+        //{
+        //    return Ok(_course_service.PostPerson(model));
+        //}
     }
 }
